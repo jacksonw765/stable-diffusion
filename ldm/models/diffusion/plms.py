@@ -2,6 +2,7 @@
 
 import torch
 import numpy as np
+import socket
 from tqdm import tqdm
 from functools import partial
 
@@ -139,8 +140,14 @@ class PLMSSampler(object):
         iterator = tqdm(time_range, desc='PLMS Sampler', total=total_steps)
         old_eps = []
 
+        # here is where the updater lives bitches
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         for i, step in enumerate(iterator):
             index = total_steps - i - 1
+            percent = 100-int((index/total_steps)*100)
+            if percent % 10 == 0:
+                print(f'Percent logged: {percent}')
+                sock.sendto(bytes(percent), ('127.0.0.1', 5001))
             ts = torch.full((b,), step, device=device, dtype=torch.long)
             ts_next = torch.full((b,), time_range[min(i + 1, len(time_range) - 1)], device=device, dtype=torch.long)
 
