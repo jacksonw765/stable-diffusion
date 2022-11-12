@@ -62,7 +62,7 @@ def load_model_from_config(config, ckpt, verbose=False):
         print("unexpected keys:")
         print(u)
 
-    model.cuda()
+    #model.cuda()
     model.eval()
     return model
 
@@ -404,7 +404,8 @@ def text2img2(opt: Options):
     config = OmegaConf.load(f"{opt.config}")
     model = load_model_from_config(config, f"{opt.ckpt}")
 
-    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    #device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    device = torch.device("cpu")
     model = model.to(device)
 
     if opt.ddim:
@@ -437,7 +438,7 @@ def text2img2(opt: Options):
     precision_scope = autocast
     generated = []
     with torch.no_grad():
-        with precision_scope("cuda"):
+        with precision_scope("cpu"):
             with model.ema_scope():
                 tic = time.time()
                 all_samples = list()
@@ -511,7 +512,7 @@ def text2img2(opt: Options):
                 t_enc = int(opt.strength * opt.steps)
 
                 with torch.no_grad():
-                    with precision_scope("cuda"):
+                    with precision_scope("cpu"):
                         with model.ema_scope():
                             for prompts in tqdm(data, desc="data"):
                                 uc = None

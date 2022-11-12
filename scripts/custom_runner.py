@@ -386,29 +386,25 @@ def realesrgan2x(executable: str, input: str, output: str):
     final_output.save(output)
 
 
-def upscale_image(_id):
+def upscale_image(_id, path):
     base_filename = _id
-    outpath = 'outputs/txt2imghd-samples'
-    sample_path = os.path.join(outpath, "samples")
     realesrgan = 'realesrgan-ncnn-vulkan/realesrgan-ncnn-vulkan.exe'
-    realesrgan2x(realesrgan, os.path.join(sample_path, f"{base_filename}.png"),
-                 os.path.join(sample_path, f"{base_filename}u.png"))
+    realesrgan2x(realesrgan, os.path.join(path, f"{base_filename}.png"),
+                 os.path.join(path, f"{base_filename}u.png"))
 
 
-def text2img2(model, sampler, prompt, _id):
+def text2img2(model, sampler, prompt, _id, W, H, steps, outpath):
     seed_everything(42)
     path = None
-    scale = 10
-    steps = 150
-    W, H, C, f = 512, 512, 4, 8,
-    outpath = 'outputs/txt2imghd-samples'
+    scale = 7
+    C, f = 4, 8
     os.makedirs(outpath, exist_ok=True)
 
     batch_size = 1
     assert prompt is not None
     data = [batch_size * [prompt]]
 
-    sample_path = os.path.join(outpath, "samples")
+    sample_path = outpath
     os.makedirs(sample_path, exist_ok=True)
 
     precision_scope = autocast
@@ -416,7 +412,7 @@ def text2img2(model, sampler, prompt, _id):
         with torch.no_grad():
             with precision_scope("cuda"):
                 with model.ema_scope():
-                    for n in trange(1, desc="Sampling"): # n_iter
+                    for n in trange(1, desc="Sampling"):
                         for prompts in tqdm(data, desc="data"):
                             uc = None
                             if scale != 1.0:
@@ -434,7 +430,6 @@ def text2img2(model, sampler, prompt, _id):
                                                              unconditional_conditioning=uc,
                                                              eta=0,
                                                              x_T=None)
-                            #print(_)
 
                             x_samples_ddim = model.decode_first_stage(samples_ddim)
                             x_samples_ddim = torch.clamp((x_samples_ddim + 1.0) / 2.0, min=0.0, max=1.0)

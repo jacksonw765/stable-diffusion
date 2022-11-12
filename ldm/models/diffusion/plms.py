@@ -145,9 +145,9 @@ class PLMSSampler(object):
         for i, step in enumerate(iterator):
             index = total_steps - i - 1
             percent = 100-int((index/total_steps)*100)
-            if percent % 10 == 0:
+            if percent % int(total_steps/10) == 0:
                 print(f'Percent logged: {percent}')
-                sock.sendto(bytes(percent), ('127.0.0.1', 5001))
+            sock.sendto(f'{percent}'.encode('utf-8'), ('127.0.0.1', 5001)) # change port
             ts = torch.full((b,), step, device=device, dtype=torch.long)
             ts_next = torch.full((b,), time_range[min(i + 1, len(time_range) - 1)], device=device, dtype=torch.long)
 
