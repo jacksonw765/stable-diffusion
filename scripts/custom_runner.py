@@ -393,8 +393,8 @@ def upscale_image(_id, path):
                  os.path.join(path, f"{base_filename}u.png"))
 
 
-def text2img2(model, sampler, prompt, _id, W, H, steps, outpath):
-    seed_everything(42)
+def text2img2(model, sampler, prompt, _id, W, H, steps, seed, outpath):
+    seed_everything(seed)
     path = None
     scale = 7
     C, f = 4, 8

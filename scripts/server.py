@@ -39,6 +39,9 @@ class Server:
         W = 512
         H = 512
         steps = 50
+        seed = 42
+        if "seed" in request_data:
+            seed = request_data['seed']
         if 'W' in request_data:
             W = request_data['W']
         if 'H' in request_data:
@@ -46,7 +49,7 @@ class Server:
         if 'steps' in request_data:
             steps = request_data['steps']
         now = time.time()
-        text2img2(self.model, self.sampler, prompt, _id, W, H, steps, self.output_dir)
+        text2img2(self.model, self.sampler, prompt, _id, W, H, steps, seed, self.output_dir)
         upscale_image(_id, self.output_dir)
         full_path = self.output_path + "\\" + _id + 'u.png'
         print(full_path)
