@@ -42,10 +42,10 @@ class Server:
         seed = 42
         if "seed" in request_data:
             seed = request_data['seed']
-        if 'W' in request_data:
-            W = request_data['W']
-        if 'H' in request_data:
-            H = request_data['H']
+        if 'width' in request_data:
+            W = request_data['width']
+        if 'height' in request_data:
+            H = request_data['height']
         if 'steps' in request_data:
             steps = request_data['steps']
         now = time.time()
